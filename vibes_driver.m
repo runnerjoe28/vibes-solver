@@ -28,6 +28,7 @@ switch problem_type_num
     case 3
     case 4
     case 5
+        handle_fourier();
     otherwise
         fprintf("INVALID INPUT, TERMINATING PROGRAM\n");
 end
