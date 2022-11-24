@@ -1,8 +1,8 @@
 % Performs a fourier transform on the specified function
-function success = handle_fourier()
+% Returns the fourier function
+function fourier_func = handle_fourier()
 
 % Set up variables for use in computation
-success = 1; % Indicates failed, change before returning
 syms t
 
 % Ask for critical information from user
