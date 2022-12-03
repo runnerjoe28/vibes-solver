@@ -205,7 +205,7 @@ fprintf("If no other terms exist, enter 0\n");
 other_forcing_func = input("Enter remaining forcing:");
 
 % Offload work to handle_forcing to do a bulk of the calculations
-response_func = handle_forcing(forced_cosine_matrix, forced_sine_matrix, forced_impulse_matrix, other_forcing_func);
+response_func = handle_forcing(m, c, k, forced_cosine_matrix, forced_sine_matrix, forced_impulse_matrix, other_forcing_func);
 
 end
 
