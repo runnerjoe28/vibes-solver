@@ -46,8 +46,9 @@ response_func = other_func;
 
 end
 
-% Count elements of sin/cos/impulse matrices (should be pre-verified
+% Count elements of sin/cos/impulse matrices (should be pre-verified)
 %   matrix - cose, sin, or impulse matrix
+%   count - number of rows in matrix
 function count = count_matrix(matrix)
 % Set up count variable    
 count = 0;
