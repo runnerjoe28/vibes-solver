@@ -1,4 +1,5 @@
 % Handles the solving of standard damped systems
+%   Returns 0 upon success
 function success = handle_standard_damping()
 
 success = 1; % Indicates failed, change before returning
@@ -16,10 +17,10 @@ response_func = 1;
 % Ask if there are forcing functions and handle the NO case
 is_forcing = input("\nIs there a forcing function [Y/N]: ", 's');
 if (is_forcing == 'N')
-    response_func = solve_EOM(m, c, k);
+    response_func = solve_Unforced_EOM(m, c, k);
     success = 0;
 else
-    % handle later
+    response_func = solve_Forced_EOM(m, c, k);
 end
 
 % Plot the response function
@@ -31,7 +32,8 @@ end
 
 
 % Solves basic no/damped system without forcing functions
-function response_func = solve_EOM(m, c, k)
+%   Returns a sybmolic function representing a response
+function response_func = solve_Unforced_EOM(m, c, k)
 
 % Set up conditional for determing damping classification + key variables
 zeta = c/(2*sqrt(k*m));
@@ -156,6 +158,54 @@ else % Over damped
     fprintf("Intial velocity (m/s):      %d\n", v0);
     
 end
+end
+
+% Solves forced vibrations problem (acts as control flow to functions in
+% handle_forcing.m
+%   Returns forcing function
+function response_func = solve_Forced_EOM(m, c, k)
+
+% Set up user polling for forcing functions
+
+% Ask user for cosine forcings
+clc;
+fprintf("Enter list of cosine forcings.\n");
+fprintf("Enter the number as a N x 2 matrix of amplitudes and frequencies.\n");
+fprintf("For a forcing function F(t) = 2*cos(t) + 4*cos(3t) + sin(2t) + t^2, you would enter the following:\n");
+fprintf("\t[2 1;4 3]\n\n");
+fprintf("For a lack of cosine forcings, just enter a value of '0'\n");
+fprintf("Note again these are in amplitude,frequency pairs in a N x 2 matrix:\n\n");
+forced_cosine_matrix = input("Enter N x 2 matrix:");
+
+% Ask user for sine forcings
+clc;
+fprintf("Enter list of sine forcings.\n");
+fprintf("Enter the number as a N x 2 matrix of amplitudes and frequencies.\n");
+fprintf("For a forcing function F(t) = 2*sin(4t) + 4*cos(3t) + sin(3t) + t, you would enter the following:\n");
+fprintf("\t[2 4;1 3]\n\n");
+fprintf("For a lack of sine forcings, just enter a value of '0'\n");
+fprintf("Note again these are in amplitude,frequency pairs in a N x 2 matrix:\n\n");
+forced_sine_matrix = input("Enter N x 2 matrix:");
+
+% Ask user for impulse forcings
+clc;
+fprintf("Enter list of impulses.\n");
+fprintf("Enter the number as a N x 2 matrix of amplitudes and times.\n");
+fprintf("For a forcing function F(t) = 2*δ(t) + δ(t-4) + sin(3t) + t, you would enter the following:\n");
+fprintf("\t[2 0;1 4]\n\n");
+fprintf("For a lack of impulses, just enter a value of '0'\n");
+fprintf("Note again these are in amplitude,frequency pairs in a N x 2 matrix:\n\n");
+forced_impulse_matrix = input("Enter N x 2 matrix:");
+
+% Ask user for other forcings
+syms t;
+clc;
+fprintf("Enter remaining forcing terms\n");
+fprintf("If no other terms exist, enter 0\n");
+other_forcing_func = input("Enter remaining forcing:");
+
+% Offload work to handle_forcing to do a bulk of the calculations
+response_func = handle_forcing(forced_cosine_matrix, forced_sine_matrix, forced_impulse_matrix, other_forcing_func);
 
 end
 
