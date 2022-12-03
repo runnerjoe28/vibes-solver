@@ -12,7 +12,7 @@ imp_matrix = check_matrix_form(imp_matrix, "impulse");
 num_cos_forcings = count_matrix(cos_matrix);
 num_sin_forcings = count_matrix(sin_matrix);
 num_imp_forcings = count_matrix(imp_matrix);
-has_extra_forcing = 1;  % 1 if other func is non-zero, 0 is 
+has_extra_forcing = 1;  % 1 if other func is non-zero, 0 if the other func is 0
 if (other_func == 0)
     has_extra_forcing = 0;
 end
@@ -89,7 +89,7 @@ function new_matrix = check_matrix_form(matrix, type)
         return;
     else    % Case 3: Ill formated matrix
         fprintf("The %s matrix is ill-formed, setting it to [0], restart program by ctrl+C if desired\n", type);
-        new_matrix = [0];
+        new_matrix = 0;
     end
     
 end
