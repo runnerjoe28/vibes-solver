@@ -1,6 +1,13 @@
 % Essentially a library for solving forcing functions
 
-% NEED TO IMPLEMENT LATER
+% Create the response for a forced single DOF function
+%   m - mass of the system
+%   c - damping coefficient
+%   k - spring constant
+%   cos_matrix - N x 2 matrix with amplitude,frequency pairs
+%   sin_matrix - N x 2 matrix with amplitude,frequency pairs
+%   imp_matrix - N x 2 matrix with amplitude,time pairs
+%   other_func - symbolic function other other forcings
 function response_func = handle_forcing(m, c, k, cos_matrix, sin_matrix, imp_matrix, other_func)
 clc;
 % First verify input format
@@ -24,6 +31,10 @@ v0 = input("Initial velocity (m/s):   ");
 clc;
 
 response_func = 0;
+
+% Get the matrix of impulse reactions
+imp_responses = find_impulse_response(imp_matrix, m, c, k);
+disp(imp_responses)
 
 % Handle variations between easy, hardcoded examples and general solution
 % examples
@@ -54,7 +65,7 @@ function count = count_matrix(matrix)
 count = 0;
 
 % Perform size checks and counts
-[num_elems num_cols] = size(matrix);
+[num_elems, num_cols] = size(matrix);
 if (num_cols == 1)  % 1 column => [0] matrix/no forcings
     return;
 else
@@ -93,3 +104,80 @@ function new_matrix = check_matrix_form(matrix, type)
     end
     
 end
+
+% Computes a response of all impulses
+% If there are no impulses (input is 0) then the response is zero
+%   impulse: N X 2 properly formatted impulse matrix
+%   imp_resp: response function from the impulses
+function imp_resp = find_impulse_response(impulses, m, c, k)
+
+% Set up variables and get number of impulses
+imp_resp = 0;
+[num_impulses, num_cols] = size(impulses);
+
+% Handle no impulse case
+if (num_cols == 1)
+    return;
+end
+
+% Compute key parameters
+zeta = c/(2*sqrt(k*m));
+wn = sqrt(k/m);
+wd = wn*sqrt(1 - zeta^2);
+
+% Set up return statements
+syms t;
+
+% Loop through impulses, construct response
+for i = 1:num_impulses
+
+    % Get impulse information here
+    impulse_mag = impulses(i,1);
+    impulse_time = impulses(i,2);
+    fprintf("Impulse of %i at t=%i\n", impulse_mag, impulse_time);
+    cur_impulse_function = 0;
+    
+    % Set initial position and initial velocity from impulse
+    x0 = 0;
+    v0 = impulse_mag/m;
+    
+    % Handle all 4 types of system
+    if (c == 0) % No damping
+
+        % Compute response
+        amp = sqrt(wn^2 * x0^2 + v0^2)/wn;
+        phi = atan(wn*x0/v0);
+        cur_impulse_function = amp*sin(wn*(t - impulse_time) + phi);
+
+    elseif (zeta < 1) % Under damped
+
+        % Compute response
+        amp = sqrt( (v0 + zeta*wn*x0)^2 + (x0*wd)^2 )/wd;
+        phi = atan( (x0*wd) / (v0 + zeta*wn*x0) );
+        cur_impulse_function = amp * exp(-zeta*wn*(t - impulse_time)) * sin(wd*(t - impulse_time) + phi);
+
+    elseif (zeta == 1) % Critically damped
+
+        % Compute response
+        a1 = x0;
+        a2 = v0 + wn*x0;
+        cur_impulse_function = (a1 + a2*(t - impulse_time)) * exp(-wn*(t - impulse_time));
+
+    else % Over damped
+
+        % Compute response
+        zeta_term = sqrt(zeta^2 - 1);
+        a1 = (-v0 + (-zeta+zeta_term)*wn*x0)/(2*wn*zeta_term);
+        a2 = (v0 + (zeta+zeta_term)*wn*x0)/(2*wn*zeta_term);
+        cur_impulse_function = exp(-zeta*wn*(t - impulse_time))*(a1*exp(-wn*zeta_term*(t - impulse_time)) + a2*exp(wn*zeta_term*(t - impulse_time)));
+
+    end
+    
+    % Add current function to total response
+    imp_resp = imp_resp + heaviside(t - impulse_time)*cur_impulse_function;
+    
+end
+
+end
+
+
