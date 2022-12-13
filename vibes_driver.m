@@ -27,6 +27,7 @@ switch problem_type_num
         handle_dry_damping();
     case 3
     case 4
+        handle_rotating_imbalance();
     case 5
         handle_fourier();
     otherwise
