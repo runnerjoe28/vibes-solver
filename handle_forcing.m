@@ -30,23 +30,20 @@ x0 = input("Initial displacement (m): ");
 v0 = input("Initial velocity (m/s):   ");
 clc;
 
-response_func = 0;
-
 % Get the matrix of impulse reactions
-imp_responses = find_impulse_response(imp_matrix, m, c, k);
-disp(imp_responses)
+response_func = find_impulse_response(imp_matrix, m, c, k);
 
 % Handle variations between easy, hardcoded examples and general solution
 % examples
 if (has_extra_forcing == 0)
     if (num_cos_forcings == 1 && num_sin_forcings == 0)
         % Handle single cosine case
-        fprintf("Single cos\n");
-        return;
+        F0 = cos_matrix(1,1);
+        w = cos_matrix(1,2);
+        response_func = response_func + find_cosine_response(m, c, k, x0, v0, F0, w);
     elseif (num_sin_forcings == 1 && num_cos_forcings == 0)
         % Handle single sine case
         fprintf("Single sin\n");
-        return;
     end
 end
 
@@ -176,6 +173,70 @@ for i = 1:num_impulses
     % Add current function to total response
     imp_resp = imp_resp + heaviside(t - impulse_time)*cur_impulse_function;
     
+end
+
+end
+
+% Gets the cosine forcing for a single cosine forcing
+%   m - mass
+%   c - damping coefficient
+%   k - spring  constant
+%   x0 - initial position
+%   v0 - initial velocity
+%   F0 - amplitude of forcing
+%   w - frequency of forcing
+%   cos_resp - forced response (xh and xp)
+function cos_resp = find_cosine_response(m, c, k, x0, v0, F0, w)
+
+% Compute key parameters
+zeta = c/(2*sqrt(k*m));
+wn = sqrt(k/m);
+wd = wn*sqrt(1 - zeta^2);
+syms t;
+
+% Handle all 4 types of system
+if (c == 0) % No damping
+
+    % Compute response
+    A1 = x0 - F0/(k-m*omega^2);
+    A2 = v0/wn;
+    cos_resp = F0/(k-m*w^2)*cos(w*t) + A1*cos(wn*t) + A2*sin(wn*t);
+    return;
+end
+    
+% Find xp for general damped systems
+As = (wn^2 - w^2)*(F0/m) / ((wn^2 - w^2)^2 + (2*zeta*wn*w)^2);
+Bs = (2*zeta*wn*w)*(F0/m) / ((wn^2 - w^2)^2 + (2*zeta*wn*w)^2);
+xp = As*cos(w*t) + Bs*sin(w*t);
+
+% Adjusts initial conditions
+x0 = x0 - As;
+v0 = v0 - w*Bs;
+
+% Handle damped systems
+if (zeta < 1) % Under damped
+
+    % Compute response
+    wd = wn*sqrt(1 - zeta^2);
+    amp = sqrt( (v0 + zeta*wn*x0)^2 + (x0*wd)^2 )/wd;
+    phi = atan( (x0*wd) / (v0 + zeta*wn*x0) );
+    cos_resp = amp * exp(-zeta*wn*t) * sin(wd*t + phi);
+    
+elseif (zeta == 1) % Critically damped
+
+    % Compute response
+    a1 = x0;
+    a2 = v0 + wn*x0;
+    cos_resp = (a1 + a2*t) * exp(-wn*t);
+
+else % Over damped
+
+    % Compute response
+    zeta_term = sqrt(zeta^2 - 1);
+    a1 = (-v0 + (-zeta+zeta_term)*wn*x0)/(2*wn*zeta_term);
+    a2 = (v0 + (zeta+zeta_term)*wn*x0)/(2*wn*zeta_term);
+    cos_resp = exp(-zeta*wn*t)*(a1*exp(-wn*zeta_term*t) + a2*exp(wn*zeta_term*t));
+
 end
 
 end
