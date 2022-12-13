@@ -175,7 +175,7 @@ fprintf("For a forcing function F(t) = 2*cos(t) + 4*cos(3t) + sin(2t) + t^2, you
 fprintf("\t[2 1;4 3]\n\n");
 fprintf("For a lack of cosine forcings, just enter a value of '0'\n");
 fprintf("Note again these are in amplitude,frequency pairs in a N x 2 matrix:\n\n");
-forced_cosine_matrix = input("Enter N x 2 matrix:");
+forced_cosine_matrix = input("Enter N x 2 matrix: ");
 
 % Ask user for sine forcings
 clc;
@@ -185,7 +185,7 @@ fprintf("For a forcing function F(t) = 2*sin(4t) + 4*cos(3t) + sin(3t) + t, you 
 fprintf("\t[2 4;1 3]\n\n");
 fprintf("For a lack of sine forcings, just enter a value of '0'\n");
 fprintf("Note again these are in amplitude,frequency pairs in a N x 2 matrix:\n\n");
-forced_sine_matrix = input("Enter N x 2 matrix:");
+forced_sine_matrix = input("Enter N x 2 matrix: ");
 
 % Ask user for impulse forcings
 clc;
@@ -195,14 +195,14 @@ fprintf("For a forcing function F(t) = 2*δ(t) + δ(t-4) + sin(3t) + t, you woul
 fprintf("\t[2 0;1 4]\n\n");
 fprintf("For a lack of impulses, just enter a value of '0'\n");
 fprintf("Note again these are in amplitude,frequency pairs in a N x 2 matrix:\n\n");
-forced_impulse_matrix = input("Enter N x 2 matrix:");
+forced_impulse_matrix = input("Enter N x 2 matrix: ");
 
 % Ask user for other forcings
 syms t;
 clc;
 fprintf("Enter remaining forcing terms\n");
 fprintf("If no other terms exist, enter 0\n");
-other_forcing_func = input("Enter remaining forcing:");
+other_forcing_func = input("Enter remaining forcing: ");
 
 % Offload work to handle_forcing to do a bulk of the calculations
 response_func = handle_forcing(m, c, k, forced_cosine_matrix, forced_sine_matrix, forced_impulse_matrix, other_forcing_func);
