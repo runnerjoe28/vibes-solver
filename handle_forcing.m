@@ -6,7 +6,7 @@
 %   k - spring constant
 %   cos_matrix - N x 2 matrix with amplitude,frequency pairs
 %   sin_matrix - N x 2 matrix with amplitude,frequency pairs
-%   imp_matrix - N x 2 matrix with amplitude,time pairs
+%   imp_matrix - N x 2 matrix with amplitude,time pairs for impulsing
 %   other_func - symbolic function other other forcings
 function response_func = handle_forcing(m, c, k, cos_matrix, sin_matrix, imp_matrix, other_func)
 clc;

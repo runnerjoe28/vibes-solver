@@ -1,8 +1,8 @@
-% Clear workspace and command window
+%% Clear workspace and command window
 clc;
 clear;
 
-% Initiate options for vibrations solving, and display to user in prompt
+%% Initiate options for vibrations solving, and display to user in prompt
 % There are 5 options for users
 %       1. Standard damping (none, under, critically, and over dampled)
 %       2. Dry damping
@@ -18,7 +18,7 @@ fprintf("\t5 - Fourier Transform\n");
 problem_type_num = input("\nPlease enter number of problem type: ");
 fprintf("%i\n", problem_type_num);
 
-% Handle each problem type (delegate to other .m files)
+%% Handle each problem type (delegate to other .m files)
 clc;
 switch problem_type_num
     case 1

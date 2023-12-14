@@ -1,4 +1,4 @@
-% Handles the solving of standard damped systems
+%% Handles the solving of standard damped systems
 %   Returns 0 upon success
 function success = handle_standard_damping()
 
@@ -12,15 +12,17 @@ k = input("Spring constant (N/m):      ");
 
 % Create response_func for general plotting later
 syms response_func(t)
-response_func = 1;
 
 % Ask if there are forcing functions and handle the NO case
 is_forcing = input("\nIs there a forcing function [Y/N]: ", 's');
 if (is_forcing == 'N')
-    response_func = solve_Unforced_EOM(m, c, k);
+    response_func = solve_unforced_EOM(m, c, k);
+    success = 0;
+elseif (is_forcing == 'Y')
+    response_func = solve_forced_EOM(m, c, k);
     success = 0;
 else
-    response_func = solve_Forced_EOM(m, c, k);
+    return
 end
 
 % Plot the response function
@@ -31,9 +33,9 @@ xlim([0 upper_limit]);
 end
 
 
-% Solves basic no/damped system without forcing functions
+%% Solves basic no/damped system without forcing functions
 %   Returns a sybmolic function representing a response
-function response_func = solve_Unforced_EOM(m, c, k)
+function response_func = solve_unforced_EOM(m, c, k)
 
 % Set up conditional for determing damping classification + key variables
 zeta = c/(2*sqrt(k*m));
@@ -160,10 +162,9 @@ else % Over damped
 end
 end
 
-% Solves forced vibrations problem (acts as control flow to functions in
-% handle_forcing.m
+%% Solves forced vibrations problem (acts as control flow to functions in handle_forcing.m
 %   Returns forcing function
-function response_func = solve_Forced_EOM(m, c, k)
+function response_func = solve_forced_EOM(m, c, k)
 
 % Set up user polling for forcing functions
 
